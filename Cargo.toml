@@ -1,0 +1,37 @@
+[package]
+name = "syn"
+version = "0.1.0"
+edition = "2021"
+description = "Personal knowledge base CLI — LLM-maintained persistent wiki"
+repository = "https://github.com/eban.y/syn"
+license = "MIT"
+default-run = "syn"
+
+[[bin]]
+name = "syn"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+futures-util = "0.3"
+htmd = "0.1"
+reqwest = { version = "0.12", features = ["json", "stream", "rustls-tls"], default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "io-std", "time"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+chrono = { version = "0.4", features = ["serde"] }
+glob = "0.3"
+walkdir = "2"
+iocraft = "0.8"
+
+[dev-dependencies]
+assert_cmd = "2"
+tempfile = "3"
+predicates = "3"
+wiremock = "0.6"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

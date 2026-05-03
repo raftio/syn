@@ -1,0 +1,12 @@
+# Log
+
+Append-only chronological record of all syn operations.
+
+Each entry starts with `## [YYYY-MM-DD] <op> | <title>` so it can be grepped:
+
+```
+grep "^## \[" log.md | tail -5
+```
+
+---
+

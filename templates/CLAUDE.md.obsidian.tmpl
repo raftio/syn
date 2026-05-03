@@ -1,0 +1,76 @@
+# Knowledge Base Schema
+
+This file is the schema for this syn knowledge base. It tells the LLM how the
+wiki is structured, what conventions to follow, and what workflows to use.
+
+## Directory layout
+
+```
+<vault-root>/
+├── CLAUDE.md          ← this file (schema)
+├── index.md           ← catalog of all wiki pages
+├── log.md             ← append-only operation log
+├── syn-sources/       ← immutable source documents (never modify)
+└── syn/               ← LLM-authored markdown pages
+    ├── entities/      ← pages for people, places, products, organisations
+    ├── concepts/      ← pages for ideas, topics, frameworks
+    ├── sources/       ← one-page summaries of each ingested source
+    └── synthesis/     ← comparisons, analyses, cross-cutting essays
+```
+
+## Page conventions
+
+Every wiki page should include YAML frontmatter:
+
+```yaml
+---
+title: "Page Title"
+tags: [concept, entity]            # optional
+sources: [syn-sources/article1.md] # source documents that informed this page
+updated: 2026-04-22
+---
+```
+
+Use `[[Note Name]]` wikilinks (Obsidian-style) for cross-references — just the
+note title, no path prefix and no `.md` extension.
+
+## Ingest workflow
+
+When ingesting a new source:
+
+1. Read the source document in full.
+2. Write a summary page at `syn/sources/<slug>.md`.
+3. Create or update entity pages for key people, places, organisations.
+4. Create or update concept pages for key ideas or frameworks.
+5. Update `index.md` — add an entry for every new or substantially updated page.
+6. Append a log entry to `log.md` using the format:
+   `## [YYYY-MM-DD] ingest | <Source Title>`
+
+Return all file operations as `wiki_edit` tool calls.
+
+## Query workflow
+
+When answering a question:
+
+1. Read `index.md` to identify relevant pages.
+2. Read those pages.
+3. Synthesise an answer with citations using `[[Note Name]]` wikilinks.
+4. If the answer is substantial and reusable, offer to file it as a new
+   `syn/synthesis/<slug>.md` page.
+
+## Lint workflow
+
+When linting:
+
+1. Note any contradictions between pages.
+2. Identify orphan pages (no inbound wikilinks).
+3. Flag stale claims (superseded by newer sources).
+4. Suggest missing concept pages and new sources to seek out.
+
+## Style
+
+- Write in plain, clear prose.
+- Use headers (##, ###) to organise long pages.
+- Keep pages focused — one entity or concept per page.
+- Use bullet lists for attributes, timelines, comparisons.
+- Never modify files in `syn-sources/`.
