@@ -1,3 +1,5 @@
+mod common;
+
 use assert_cmd::Command;
 use predicates::prelude::*;
 use tempfile::TempDir;
@@ -128,12 +130,13 @@ async fn ingest_fails_with_missing_source_file() {
 #[tokio::test]
 async fn ingest_fails_outside_kb() {
     let dir = TempDir::new().unwrap();
-    // No wai init — no .wai/config.toml
+    // No init — and isolate global registry so a dev machine's sole vault is not used.
 
     let source_path = dir.path().join("article.md");
     std::fs::write(&source_path, "# Article\n").unwrap();
 
     wai(&dir)
+        .env("SYN_GLOBAL_CONFIG", common::empty_global_config_path(&dir))
         .arg("ingest")
         .arg(source_path.to_str().unwrap())
         .env("ANTHROPIC_API_KEY", "test-key")

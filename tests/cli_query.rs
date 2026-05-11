@@ -1,3 +1,5 @@
+mod common;
+
 use assert_cmd::Command;
 use predicates::prelude::*;
 use tempfile::TempDir;
@@ -93,6 +95,7 @@ async fn query_save_creates_synthesis_page() {
 async fn query_fails_outside_kb() {
     let dir = TempDir::new().unwrap();
     wai(&dir)
+        .env("SYN_GLOBAL_CONFIG", common::empty_global_config_path(&dir))
         .args(["query", "anything"])
         .env("ANTHROPIC_API_KEY", "test-key")
         .assert()

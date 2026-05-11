@@ -3,6 +3,8 @@ use clap::Args;
 use std::io::Write;
 
 use crate::config::{Config, paths::resolve_kb_root};
+
+use super::Cli;
 use crate::llm::LlmProvider;
 use crate::wiki::edits::{apply_edits, parse_edit};
 use crate::wiki::lint;
@@ -26,8 +28,8 @@ pub struct LintArgs {
     pub yes: bool,
 }
 
-pub async fn run(args: &LintArgs) -> Result<()> {
-    let kb_root = resolve_kb_root()?;
+pub async fn run(args: &LintArgs, cli: &Cli) -> Result<()> {
+    let kb_root = resolve_kb_root(&cli.kb_resolve_opts())?;
     let mut config = Config::load(&kb_root)?;
 
     if let Some(m) = &args.model {

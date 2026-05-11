@@ -2,6 +2,8 @@ use anyhow::Result;
 use clap::Args;
 
 use crate::config::{Config, paths::resolve_kb_root};
+
+use super::Cli;
 use crate::ui;
 use crate::wiki::log::read_recent;
 
@@ -12,8 +14,8 @@ pub struct LogArgs {
     pub tail: usize,
 }
 
-pub fn run(args: &LogArgs) -> Result<()> {
-    let kb_root = resolve_kb_root()?;
+pub fn run(args: &LogArgs, cli: &Cli) -> Result<()> {
+    let kb_root = resolve_kb_root(&cli.kb_resolve_opts())?;
     let config = Config::load(&kb_root)?;
     let log_path = config.log_path(&kb_root);
 

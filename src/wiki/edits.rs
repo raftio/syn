@@ -32,24 +32,28 @@ impl std::fmt::Display for EditOp {
 
 /// Parse a `wiki_edit` tool input into an `Edit`.
 pub fn parse_edit(input: &serde_json::Value) -> Result<Edit, WaiError> {
-    let op_str = input["op"]
-        .as_str()
-        .ok_or_else(|| WaiError::InvalidEdit("missing 'op' field".to_string()))?;
-
-    let op = match op_str {
-        "create" => EditOp::Create,
-        "update" => EditOp::Update,
-        "append" => EditOp::Append,
-        "delete" => EditOp::Delete,
-        other => return Err(WaiError::InvalidEdit(format!("unknown op: {other}"))),
-    };
-
     let path = input["path"]
         .as_str()
         .ok_or_else(|| WaiError::InvalidEdit("missing 'path' field".to_string()))?
         .to_string();
 
     let content = input["content"].as_str().map(str::to_string);
+
+    let op = match input["op"].as_str() {
+        Some("create") => EditOp::Create,
+        Some("update") => EditOp::Update,
+        Some("append") => EditOp::Append,
+        Some("delete") => EditOp::Delete,
+        Some(other) => return Err(WaiError::InvalidEdit(format!("unknown op: {other}"))),
+        // Infer op when the model omits it
+        None => {
+            if content.is_some() {
+                EditOp::Create
+            } else {
+                EditOp::Delete
+            }
+        }
+    };
 
     Ok(Edit { op, path, content })
 }

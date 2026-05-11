@@ -28,13 +28,14 @@ async fn main() -> Result<()> {
     fmt().with_env_filter(filter).without_time().init();
 
     match &cli.command {
-        Command::Init(args)   => cli::init::run(args)?,
-        Command::Ingest(args) => cli::ingest::run(args).await?,
-        Command::Query(args)  => cli::query::run(args).await?,
-        Command::Search(args) => cli::search::run(args)?,
-        Command::Log(args)    => cli::log_cmd::run(args)?,
-        Command::Config { action } => cli::config_cmd::run(action)?,
-        Command::Lint(args)    => cli::lint::run(args).await?,
+        Command::Init(args) => cli::init::run(args)?,
+        Command::Ingest(args) => cli::ingest::run(args, &cli).await?,
+        Command::Query(args) => cli::query::run(args, &cli).await?,
+        Command::Search(args) => cli::search::run(args, &cli)?,
+        Command::Log(args) => cli::log_cmd::run(args, &cli)?,
+        Command::Config { action } => cli::config_cmd::run(action, &cli)?,
+        Command::Lint(args) => cli::lint::run(args, &cli).await?,
+        Command::Vault { action } => cli::vault::run(action)?,
     }
 
     Ok(())

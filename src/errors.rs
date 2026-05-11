@@ -21,6 +21,8 @@ pub enum WaiError {
     #[error("source load error: {0}")]
     SourceLoad(String),
 
-    #[error("not inside a syn knowledge base (no .syn/config.toml found)")]
+    #[error(
+        "not inside a syn knowledge base — run from the vault tree, or set SYN_KB / SYN_VAULT, use --kb-root / -w NAME, `syn vault default`, or register exactly one vault"
+    )]
     NotAKnowledgeBase,
 }

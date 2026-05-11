@@ -14,15 +14,23 @@ pub struct InitArgs {
     /// Initialise inside an existing Obsidian vault (uses syn/ + syn-sources/ dirs)
     #[arg(long)]
     pub vault: bool,
+
+    /// Register this KB under NAME in the global syn config after a successful init
+    #[arg(long, value_name = "NAME")]
+    pub register: Option<String>,
 }
 
 pub fn run(args: &InitArgs) -> Result<()> {
     let cwd = std::env::current_dir()?;
     if args.vault {
-        init_vault(&cwd, args.force)
+        init_vault(&cwd, args.force)?;
     } else {
-        init_plain(&cwd, args.force)
+        init_plain(&cwd, args.force)?;
     }
+    if let Some(name) = &args.register {
+        super::vault::register(name, &cwd)?;
+    }
+    Ok(())
 }
 
 pub fn init_plain(root: &Path, force: bool) -> Result<()> {
@@ -61,20 +69,18 @@ pub fn init_plain(root: &Path, force: bool) -> Result<()> {
     let config = Config::default();
     config.save(root)?;
 
-    let schema_path = root.join("CLAUDE.md");
-    if !schema_path.exists() || force {
-        std::fs::write(&schema_path, include_str!("../../templates/CLAUDE.md.tmpl"))?;
-    }
-
-    let index_path = root.join("index.md");
-    if !index_path.exists() || force {
-        std::fs::write(&index_path, include_str!("../../templates/index.md.tmpl"))?;
-    }
-
-    let log_path = root.join("log.md");
-    if !log_path.exists() || force {
-        std::fs::write(&log_path, include_str!("../../templates/log.md.tmpl"))?;
-    }
+    std::fs::write(
+        root.join("CLAUDE.md"),
+        include_str!("../../templates/CLAUDE.md.tmpl"),
+    )?;
+    std::fs::write(
+        root.join("index.md"),
+        include_str!("../../templates/index.md.tmpl"),
+    )?;
+    std::fs::write(
+        root.join("log.md"),
+        include_str!("../../templates/log.md.tmpl"),
+    )?;
 
     ui::init_banner::print(&root.display().to_string(), false);
     ui::init_banner::print_next_steps(false);
@@ -134,20 +140,18 @@ pub fn init_vault(root: &Path, force: bool) -> Result<()> {
     });
     config.save(root)?;
 
-    let schema_path = root.join("CLAUDE.md");
-    if !schema_path.exists() || force {
-        std::fs::write(&schema_path, include_str!("../../templates/CLAUDE.md.obsidian.tmpl"))?;
-    }
-
-    let index_path = root.join("index.md");
-    if !index_path.exists() || force {
-        std::fs::write(&index_path, include_str!("../../templates/index.md.obsidian.tmpl"))?;
-    }
-
-    let log_path = root.join("log.md");
-    if !log_path.exists() || force {
-        std::fs::write(&log_path, include_str!("../../templates/log.md.tmpl"))?;
-    }
+    std::fs::write(
+        root.join("CLAUDE.md"),
+        include_str!("../../templates/CLAUDE.md.obsidian.tmpl"),
+    )?;
+    std::fs::write(
+        root.join("index.md"),
+        include_str!("../../templates/index.md.obsidian.tmpl"),
+    )?;
+    std::fs::write(
+        root.join("log.md"),
+        include_str!("../../templates/log.md.tmpl"),
+    )?;
 
     ui::init_banner::print(&root.display().to_string(), true);
     ui::init_banner::print_next_steps(true);

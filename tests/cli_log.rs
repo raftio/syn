@@ -1,3 +1,5 @@
+mod common;
+
 use assert_cmd::Command;
 use predicates::prelude::*;
 use tempfile::TempDir;
@@ -42,6 +44,7 @@ fn log_empty_shows_hint() {
 fn log_fails_outside_kb() {
     let dir = TempDir::new().unwrap();
     wai(&dir)
+        .env("SYN_GLOBAL_CONFIG", common::empty_global_config_path(&dir))
         .arg("log")
         .assert()
         .failure()
