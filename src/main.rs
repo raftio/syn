@@ -31,6 +31,7 @@ async fn main() -> Result<()> {
         Command::Init(args) => cli::init::run(args)?,
         Command::Ingest(args) => cli::ingest::run(args, &cli).await?,
         Command::Query(args) => cli::query::run(args, &cli).await?,
+        Command::Chat(args) => cli::chat::run(args, &cli).await?,
         Command::Search(args) => cli::search::run(args, &cli)?,
         Command::Log(args) => cli::log_cmd::run(args, &cli)?,
         Command::Config { action } => cli::config_cmd::run(action, &cli)?,

@@ -1,3 +1,4 @@
+pub mod chat;
 pub mod config_cmd;
 pub mod init;
 pub mod ingest;
@@ -49,6 +50,9 @@ pub enum Command {
 
     /// Query the wiki
     Query(query::QueryArgs),
+
+    /// Interactive multi-turn wiki chat (stdin)
+    Chat(chat::ChatArgs),
 
     /// Search wiki pages locally (BM25)
     Search(search::SearchArgs),
