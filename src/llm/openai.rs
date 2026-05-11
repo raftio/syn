@@ -84,6 +84,21 @@ impl OpenAiClient {
                     .unwrap_or_else(|| 2_f64.powi(attempt as i32 + 1))
                     .max(1.0);
 
+                let source = if retry_after.is_some() {
+                    "Retry-After header"
+                } else if parse_retry_secs(&err_body).is_some() {
+                    "response body"
+                } else {
+                    "exponential backoff"
+                };
+                tracing::warn!(
+                    attempt = attempt + 1,
+                    max = MAX_RETRIES,
+                    delay_secs = delay,
+                    delay_source = source,
+                    body = %err_body,
+                    "OpenAI rate limit (429) — retrying"
+                );
                 eprint!(
                     "\r\x1b[2K\x1b[90m[rate limit] waiting {delay:.1}s then retrying ({}/{MAX_RETRIES})…\x1b[0m",
                     attempt + 1
@@ -166,7 +181,7 @@ fn build_request_body(req: &MessageRequest, model: &str, max_tokens: u32) -> ser
 
     let mut body = serde_json::json!({
         "model": model,
-        "max_tokens": max_tokens,
+        "max_completion_tokens": max_tokens,
         "messages": messages,
         "stream": true,
     });

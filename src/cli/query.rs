@@ -3,6 +3,8 @@ use clap::Args;
 use std::io::Write;
 
 use crate::config::{Config, paths::resolve_kb_root};
+
+use super::Cli;
 use crate::llm::LlmProvider;
 use crate::search::BM25Index;
 use crate::sources::to_slug;
@@ -22,8 +24,8 @@ pub struct QueryArgs {
     pub model: Option<String>,
 }
 
-pub async fn run(args: &QueryArgs) -> Result<()> {
-    let kb_root = resolve_kb_root()?;
+pub async fn run(args: &QueryArgs, cli: &Cli) -> Result<()> {
+    let kb_root = resolve_kb_root(&cli.kb_resolve_opts())?;
     let mut config = Config::load(&kb_root)?;
 
     if let Some(m) = &args.model {
@@ -62,7 +64,8 @@ pub async fn run(args: &QueryArgs) -> Result<()> {
             slug.clone()
         };
         save_answer(&answer, &args.question, &slug, &kb_root, &config)?;
-        eprintln!("\nSaved → wiki/synthesis/{slug}.md");
+        let wiki_name = config.wiki_dir_name();
+        eprintln!("\nSaved → {wiki_name}/synthesis/{slug}.md");
     }
 
     Ok(())
@@ -76,7 +79,10 @@ fn save_answer(
     config: &Config,
 ) -> Result<()> {
     let date = chrono::Local::now().format("%Y-%m-%d").to_string();
-    let page_path = kb_root.join("wiki").join("synthesis").join(format!("{slug}.md"));
+    let page_path = config
+        .wiki_dir(kb_root)
+        .join("synthesis")
+        .join(format!("{slug}.md"));
 
     let content = format!(
         "---\ntitle: \"{question}\"\ntags: [synthesis]\nupdated: {date}\n---\n\n# {question}\n\n{answer}\n"
@@ -89,7 +95,8 @@ fn save_answer(
 
     // Append to index.md
     let index_path = config.index_path(kb_root);
-    let entry = format!("- [{question}](wiki/synthesis/{slug}.md) — query answer\n");
+    let wiki_name = config.wiki_dir_name();
+    let entry = format!("- [{question}]({wiki_name}/synthesis/{slug}.md) — query answer\n");
     use std::io::Write as _;
     let mut f = std::fs::OpenOptions::new().append(true).open(&index_path)?;
     writeln!(f, "{entry}")?;

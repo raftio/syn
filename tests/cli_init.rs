@@ -9,6 +9,33 @@ fn wai(dir: &TempDir) -> Command {
 }
 
 #[test]
+fn init_overwrites_existing_scaffold_files() {
+    let dir = TempDir::new().unwrap();
+    std::fs::write(dir.path().join("CLAUDE.md"), "PREEXISTING_CLAUDE\n").unwrap();
+    std::fs::write(dir.path().join("index.md"), "PREEXISTING_INDEX\n").unwrap();
+    std::fs::write(dir.path().join("log.md"), "PREEXISTING_LOG\n").unwrap();
+    wai(&dir).arg("init").assert().success();
+    let claude = std::fs::read_to_string(dir.path().join("CLAUDE.md")).unwrap();
+    assert!(claude.contains("# Knowledge Base Schema"));
+    assert!(!claude.contains("PREEXISTING_CLAUDE"));
+    let index = std::fs::read_to_string(dir.path().join("index.md")).unwrap();
+    assert!(!index.contains("PREEXISTING_INDEX"));
+    let log = std::fs::read_to_string(dir.path().join("log.md")).unwrap();
+    assert!(!log.contains("PREEXISTING_LOG"));
+}
+
+#[test]
+fn init_vault_overwrites_existing_scaffold_files() {
+    let dir = TempDir::new().unwrap();
+    std::fs::create_dir(dir.path().join(".obsidian")).unwrap();
+    std::fs::write(dir.path().join("CLAUDE.md"), "PREEXISTING_VAULT_CLAUDE\n").unwrap();
+    wai(&dir).args(["init", "--vault"]).assert().success();
+    let claude = std::fs::read_to_string(dir.path().join("CLAUDE.md")).unwrap();
+    assert!(claude.contains("<vault-root>/"));
+    assert!(!claude.contains("PREEXISTING_VAULT_CLAUDE"));
+}
+
+#[test]
 fn init_creates_expected_structure() {
     let dir = TempDir::new().unwrap();
     wai(&dir).arg("init").assert().success();

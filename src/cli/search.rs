@@ -2,6 +2,8 @@ use anyhow::Result;
 use clap::Args;
 
 use crate::config::{Config, paths::resolve_kb_root};
+
+use super::Cli;
 use crate::search::BM25Index;
 use crate::ui;
 
@@ -15,8 +17,8 @@ pub struct SearchArgs {
     pub top: usize,
 }
 
-pub fn run(args: &SearchArgs) -> Result<()> {
-    let kb_root = resolve_kb_root()?;
+pub fn run(args: &SearchArgs, cli: &Cli) -> Result<()> {
+    let kb_root = resolve_kb_root(&cli.kb_resolve_opts())?;
     let config = Config::load(&kb_root)?;
     let wiki_dir = config.wiki_dir(&kb_root);
 

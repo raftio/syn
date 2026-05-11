@@ -4,6 +4,8 @@ use std::io::Write;
 use std::path::Path;
 
 use crate::config::{Config, paths::resolve_kb_root};
+
+use super::Cli;
 use crate::llm::LlmProvider;
 use crate::sources::{self, Source};
 use crate::ui;
@@ -43,8 +45,8 @@ struct IngestFailure {
     error: anyhow::Error,
 }
 
-pub async fn run(args: &IngestArgs) -> Result<()> {
-    let kb_root = resolve_kb_root()?;
+pub async fn run(args: &IngestArgs, cli: &Cli) -> Result<()> {
+    let kb_root = resolve_kb_root(&cli.kb_resolve_opts())?;
     let mut config = Config::load(&kb_root)?;
 
     if let Some(m) = &args.model {
@@ -252,7 +254,7 @@ fn print_failures(failures: &[IngestFailure]) {
     }
     let triples: Vec<(&str, &str, String)> = failures
         .iter()
-        .map(|f| (f.stage, f.input.as_str(), f.error.to_string()))
+        .map(|f| (f.stage, f.input.as_str(), format!("{:#}", f.error)))
         .collect();
     let refs: Vec<(&str, &str, &str)> = triples
         .iter()

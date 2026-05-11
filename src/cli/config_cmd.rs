@@ -1,10 +1,10 @@
 use anyhow::{anyhow, Context, Result};
 
-use super::ConfigAction;
+use super::{Cli, ConfigAction};
 use crate::config::paths::resolve_kb_root;
 
-pub fn run(action: &ConfigAction) -> Result<()> {
-    let kb_root = resolve_kb_root()?;
+pub fn run(action: &ConfigAction, cli: &Cli) -> Result<()> {
+    let kb_root = resolve_kb_root(&cli.kb_resolve_opts())?;
     let config_path = kb_root.join(".syn").join("config.toml");
 
     match action {
