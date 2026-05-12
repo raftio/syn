@@ -15,10 +15,10 @@ All wiki edits are done via a structured `wiki_edit` tool call so every change i
 
 ### Pre-built binary
 
-Download the archive for your platform, unpack it, and put the `syn` binary on your `PATH`. Release **v0.0.1** assets:
+Download the archive for your platform, unpack it, and put the `syn` binary on your `PATH`. Assets for [v0.0.1](https://github.com/raftio/syn/releases/tag/v0.0.1):
 
 | Platform | Asset |
-|----------|--------|
+| -------- | ----- |
 | macOS (Apple Silicon, aarch64) | [`syn-aarch64-apple-darwin.tar.gz`](https://github.com/raftio/syn/releases/download/v0.0.1/syn-aarch64-apple-darwin.tar.gz) |
 | Linux (x86_64) | [`syn-x86_64-unknown-linux-gnu.tar.gz`](https://github.com/raftio/syn/releases/download/v0.0.1/syn-x86_64-unknown-linux-gnu.tar.gz) |
 | Windows (x86_64) | [`syn-x86_64-pc-windows-msvc.zip`](https://github.com/raftio/syn/releases/download/v0.0.1/syn-x86_64-pc-windows-msvc.zip) |
@@ -57,6 +57,9 @@ cargo install --path .
 
 ## Quick start
 
+After [installing](#installation) `syn`:
+
+```bash
 # Initialise a knowledge base in the current directory
 syn init
 export ANTHROPIC_API_KEY=sk-...
@@ -81,7 +84,7 @@ syn lint
 
 Initialise a knowledge base in the current directory.
 
-```
+```bash
 syn init [--force] [--vault]
 ```
 
@@ -89,7 +92,8 @@ syn init [--force] [--vault]
 - `--vault` — initialise inside an existing **Obsidian vault** (uses `syn/` + `syn-sources/` dirs, Obsidian `[[Note Name]]` wikilinks)
 
 Creates:
-```
+
+```text
 .syn/config.toml   ← configuration
 CLAUDE.md          ← wiki schema / LLM instructions
 index.md           ← catalog of all pages
@@ -102,7 +106,7 @@ raw/               ← raw source files
 
 Ingest a source document into the wiki.
 
-```
+```bash
 syn ingest article.md
 syn ingest https://example.com/post
 syn ingest --dry-run article.md   # preview edits without writing
@@ -116,7 +120,7 @@ The LLM creates a summary page at `wiki/sources/<slug>.md`, creates or updates e
 
 Answer a question using the wiki.
 
-```
+```bash
 syn query "What did the article say about caching?"
 syn query --save "caching-summary" "Summarise everything on caching"
 ```
@@ -127,7 +131,7 @@ BM25 retrieves the top-K relevant pages; the LLM synthesises an answer with `[[w
 
 Interactive multi-turn wiki chat on stdin. The prompt is `chat> ` on stderr; assistant text streams on stdout.
 
-```
+```bash
 syn chat
 syn chat --model claude-opus-4-7
 ```
@@ -141,7 +145,7 @@ syn chat --model claude-opus-4-7
 
 Local BM25 search (no LLM call). Fast, offline.
 
-```
+```bash
 syn search "vector database"
 syn search --top 3 "embedding"
 ```
@@ -150,11 +154,11 @@ syn search --top 3 "embedding"
 
 Health-check the wiki.
 
-```
-syn lint              # static analysis + LLM review (read-only)
-syn lint --fix        # also auto-apply suggested fixes
-syn lint --static-only  # skip LLM pass
-syn lint --yes        # apply fixes without confirmation
+```bash
+syn lint                 # static analysis + LLM review (read-only)
+syn lint --fix           # also auto-apply suggested fixes
+syn lint --static-only   # skip LLM pass
+syn lint --yes           # apply fixes without confirmation
 ```
 
 **Static checks**: orphan pages, broken wikilinks, pages missing from `index.md`, pages without frontmatter.
@@ -165,8 +169,8 @@ syn lint --yes        # apply fixes without confirmation
 
 Show recent operation log entries.
 
-```
-syn log         # last 10 entries
+```bash
+syn log              # last 10 entries
 syn log --tail 20
 ```
 
@@ -174,7 +178,7 @@ syn log --tail 20
 
 View or edit configuration.
 
-```
+```bash
 syn config show
 syn config get llm.model
 syn config set llm.model gpt-4o
@@ -248,12 +252,12 @@ updated: 2026-04-23
 
 Pages are organised by type:
 
-| Directory | Purpose |
-|-----------|---------|
-| `wiki/entities/` | People, places, organisations, products |
-| `wiki/concepts/` | Ideas, topics, frameworks, techniques |
-| `wiki/sources/` | One-page summary per ingested document |
-| `wiki/synthesis/` | Comparisons, analyses, cross-cutting essays |
+| Directory          | Purpose                                              |
+| ------------------ | ---------------------------------------------------- |
+| `wiki/entities/`   | People, places, organisations, products              |
+| `wiki/concepts/`   | Ideas, topics, frameworks, techniques              |
+| `wiki/sources/`    | One-page summary per ingested document               |
+| `wiki/synthesis/`  | Comparisons, analyses, cross-cutting essays          |
 
 ## Requirements
 
