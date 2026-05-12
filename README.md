@@ -11,11 +11,51 @@ Personal knowledge base maintained by an LLM. You feed it documents and URLs; it
 
 All wiki edits are done via a structured `wiki_edit` tool call so every change is auditable.
 
-## Quick start
+## Installation
+
+### Pre-built binary
+
+Download the archive for your platform, unpack it, and put the `syn` binary on your `PATH`. Release **v0.0.1** assets:
+
+| Platform | Asset |
+|----------|--------|
+| macOS (Apple Silicon, aarch64) | [`syn-aarch64-apple-darwin.tar.gz`](https://github.com/raftio/syn/releases/download/v0.0.1/syn-aarch64-apple-darwin.tar.gz) |
+| Linux (x86_64) | [`syn-x86_64-unknown-linux-gnu.tar.gz`](https://github.com/raftio/syn/releases/download/v0.0.1/syn-x86_64-unknown-linux-gnu.tar.gz) |
+| Windows (x86_64) | [`syn-x86_64-pc-windows-msvc.zip`](https://github.com/raftio/syn/releases/download/v0.0.1/syn-x86_64-pc-windows-msvc.zip) |
+
+**macOS (Apple Silicon)**
 
 ```bash
-# Requires Rust (https://rustup.rs)
+curl -LO https://github.com/raftio/syn/releases/download/v0.0.1/syn-aarch64-apple-darwin.tar.gz
+tar xzf syn-aarch64-apple-darwin.tar.gz
+chmod +x syn
+sudo mv syn /usr/local/bin/
+```
+
+**Linux (x86_64)**
+
+```bash
+curl -LO https://github.com/raftio/syn/releases/download/v0.0.1/syn-x86_64-unknown-linux-gnu.tar.gz
+tar xzf syn-x86_64-unknown-linux-gnu.tar.gz
+chmod +x syn
+sudo mv syn /usr/local/bin/
+```
+
+**Windows (x86_64)**
+
+Download the [zip](https://github.com/raftio/syn/releases/download/v0.0.1/syn-x86_64-pc-windows-msvc.zip), extract `syn.exe`, and either run it from that folder or add the folder to your PATH.
+
+### Build from source
+
+Requires [Rust](https://rustup.rs) (see [Requirements](#requirements)).
+
+```bash
+git clone https://github.com/raftio/syn.git
+cd syn
 cargo install --path .
+```
+
+## Quick start
 
 # Initialise a knowledge base in the current directory
 syn init
@@ -217,7 +257,7 @@ Pages are organised by type:
 
 ## Requirements
 
-- Rust 1.75+
+- **Runtime**: the pre-built binary has no Rust requirement. Building from source needs Rust 1.75+.
 - `ANTHROPIC_API_KEY` (default) or `OPENAI_API_KEY`
 
 ## Development
