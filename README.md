@@ -1,12 +1,13 @@
 # syn
 
-Personal knowledge base maintained by an LLM. You feed it documents and URLs; it builds and cross-references a wiki of markdown pages. You query it with natural language; it answers with citations.
+Personal knowledge base maintained by an LLM. You feed it documents and URLs; it builds and cross-references a wiki of markdown pages. You query it with natural language; it answers with citations. **Chat** is the same retrieval-backed Q&A in a multi-turn stdin loop.
 
 ## How it works
 
 1. **Ingest** a source (local file or URL) → the LLM reads it, creates/updates wiki pages, and logs the operation.
 2. **Query** in plain English → BM25 retrieves the most relevant pages, the LLM synthesises an answer with `[[wikilinks]]`.
-3. **Lint** periodically → static analysis finds orphan pages, broken links, and missing frontmatter; the LLM review finds contradictions, stale claims, and knowledge gaps.
+3. **Chat** (optional) → same idea as query, but each line keeps conversation context; the wiki index is sent once in the system prompt, and each turn adds fresh BM25 hits for that line.
+4. **Lint** periodically → static analysis finds orphan pages, broken links, and missing frontmatter; the LLM review finds contradictions, stale claims, and knowledge gaps.
 
 All wiki edits are done via a structured `wiki_edit` tool call so every change is auditable.
 
@@ -26,6 +27,9 @@ syn ingest https://example.com/post
 
 # Query
 syn query "What are the main themes across my notes?"
+
+# Multi-turn chat (stdin; type exit or quit to leave)
+syn chat
 
 # Check for issues
 syn lint
@@ -78,6 +82,20 @@ syn query --save "caching-summary" "Summarise everything on caching"
 ```
 
 BM25 retrieves the top-K relevant pages; the LLM synthesises an answer with `[[wikilink]]` citations. `--save` writes the answer as a synthesis page.
+
+### `syn chat`
+
+Interactive multi-turn wiki chat on stdin. The prompt is `chat> ` on stderr; assistant text streams on stdout.
+
+```
+syn chat
+syn chat --model claude-opus-4-7
+```
+
+- Each non-empty line is searched with BM25 (same `top_k` as **Query**); retrieved page excerpts are attached to that turn’s user message.
+- The full `index.md` catalogue is included **once** in the system prompt (token-efficient vs. repeating it every turn).
+- Type **`exit`** or **`quit`** (any case), or end stdin (Ctrl-D), to stop.
+- There is no `--save` flag; use **`syn query --save …`** when you want a synthesis page written to disk.
 
 ### `syn search <query>`
 
