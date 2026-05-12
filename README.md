@@ -105,6 +105,19 @@ raw/               ← raw source files
 
 With **`syn init --vault`**, use `syn/` instead of `wiki/` and `syn-sources/` instead of `raw/` (paths in `.syn/config.toml` are updated accordingly).
 
+### `syn vault` (machine-wide registry)
+
+Register **named** knowledge bases so you can run `syn ingest`, `syn query`, etc. from any directory. This is separate from `syn init --vault`, which only chooses the **on-disk layout** (Obsidian-style `syn/` + `syn-sources/` vs default `wiki/` + `raw/`).
+
+```bash
+syn vault list                              # show global config path and NAME → root mappings
+syn vault add my-notes ~/my-obsidian-vault  # register; runs `syn init` or `syn init --vault` if `.syn/` is missing
+syn vault default my-notes                  # use this KB when CWD is not inside a KB
+syn vault clean my-notes                    # unregister and delete `.syn/` only (wiki + raw dirs stay)
+```
+
+The global flags `--kb-root <PATH>` and `-w` / `--use-vault <NAME>` apply to **ingest**, **query**, **chat**, **search**, **lint**, **log**, and **config** (they choose which KB those commands use). They are not used by `syn vault` subcommands themselves. See [Knowledge base root resolution](#knowledge-base-root-resolution).
+
 ### `syn ingest <path|url>`
 
 Ingest a source document into the wiki.
@@ -167,19 +180,6 @@ syn lint --yes           # apply fixes without confirmation
 **Static checks**: orphan pages, broken wikilinks, pages missing from `index.md`, pages without frontmatter.
 
 **LLM review**: contradictions between pages, stale claims, missing concept pages, weak cross-references.
-
-### `syn vault` (machine-wide registry)
-
-Register **named** knowledge bases so you can run `syn ingest`, `syn query`, etc. from any directory. This is separate from `syn init --vault`, which only chooses the **on-disk layout** (Obsidian-style `syn/` + `syn-sources/` vs default `wiki/` + `raw/`).
-
-```bash
-syn vault list                              # show global config path and NAME → root mappings
-syn vault add my-notes ~/my-obsidian-vault  # register; runs `syn init` or `syn init --vault` if `.syn/` is missing
-syn vault default my-notes                  # use this KB when CWD is not inside a KB
-syn vault clean my-notes                    # unregister and delete `.syn/` only (wiki + raw dirs stay)
-```
-
-The global flags `--kb-root <PATH>` and `-w` / `--use-vault <NAME>` apply to **ingest**, **query**, **chat**, **search**, **lint**, **log**, and **config** (they choose which KB those commands use). They are not used by `syn vault` subcommands themselves. See [Knowledge base root resolution](#knowledge-base-root-resolution).
 
 ### `syn log`
 
